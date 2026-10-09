@@ -20,8 +20,9 @@ export const config = {
   hostname: process.env.CHROMEDRIVER_URL || '127.0.0.1',
   port: process.env.CHROMEDRIVER_PORT || 4444,
 
-  // Tests to run
-  specs: ['./test/specs/**/*.js'],
+  // Docker-compose has no real Entra ID tenant to sign into, so this route
+  // only ever runs the pre-signin (smoke) suite.
+  specs: ['./test/specs/pre-signin/**/*.e2e.js'],
   // Tests to exclude
   exclude: [],
   maxInstances: 1,
