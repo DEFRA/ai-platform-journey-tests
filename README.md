@@ -44,6 +44,26 @@ Start application you are testing on the url specified in `baseUrl` [wdio.local.
 npm run test:local
 ```
 
+Specs are split into `test/specs/pre-signin/` (no sign-in needed, safe to run against anything)
+and `test/specs/post-signin/` (drives the real Entra ID login, so needs a frontend connected to a
+real tenant plus a dedicated test account). To run the post-signin spec, copy
+[.env.local.example](.env.local.example) to `.env.local` (git-ignored, never commit real values)
+and fill in:
+
+```
+JOURNEY_TEST_USER_EMAIL=<test account email>
+JOURNEY_TEST_USER_PASSWORD=<test account password>
+```
+
+```bash
+npm run test:local
+```
+
+On CDP Portal, the same split is selected via the `full`/`smoke` WDIO suites and the `PROFILE`
+field on a manual test run (`smoke` = pre-signin only, `full` = both - see
+[wdio.conf.js](wdio.conf.js)); the credentials there come from the Portal's per-environment
+Secrets screen, not this file.
+
 ### Debugging local tests
 
 ```bash

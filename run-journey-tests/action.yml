@@ -1,10 +1,10 @@
 name: Run Journey Tests on GitHub
 
 inputs:
-  example-node-backend:
+  ai-platform-frontend:
     required: false
     type: string
-  example-node-frontend:
+  ai-platform-backend-api:
     required: false
     type: string
 
@@ -12,15 +12,13 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-      with:
-        repository: DEFRA/cdp-node-journey-test-suite-template
 
     - name: Docker Login
       uses: DEFRA/cdp-build-action/docker-login@main
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version-file: .nvmrc
         cache: npm
     - name: Setup the tests
       run: npm i
@@ -28,8 +26,8 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
-          CDP_EXAMPLE_NODE_FRONTEND=${{inputs.example-node-frontend}} \
-          CDP_EXAMPLE_NODE_BACKEND=${{inputs.example-node-backend}} \
+          AI_PLATFORM_FRONTEND=${{inputs.ai-platform-frontend}} \
+          AI_PLATFORM_BACKEND_API=${{inputs.ai-platform-backend-api}} \
           docker compose up --wait-timeout 300 -d --quiet-pull
     - name: Run the tests
       shell: bash

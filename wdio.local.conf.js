@@ -1,4 +1,11 @@
+import { existsSync } from 'node:fs'
+import process from 'node:process'
 import allure from 'allure-commandline'
+
+// Local-only, git-ignored: JOURNEY_TEST_USER_EMAIL/PASSWORD for the post-signin suite.
+if (existsSync('.env.local')) {
+  process.loadEnvFile('.env.local')
+}
 
 const debug = process.env.DEBUG
 const oneMinute = 60 * 1000

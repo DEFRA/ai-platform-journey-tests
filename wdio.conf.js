@@ -14,16 +14,25 @@ export const config = {
   // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
   // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
   // gets prepended directly.
-  baseUrl: `https://ai-platform-journey-tests.${process.env.ENVIRONMENT}.cdp-int.defra.cloud`,
+  // This is the frontend under test, not this test-suite's own CDP url.
+  baseUrl: `https://ai-platform-frontend.${process.env.ENVIRONMENT}.cdp-int.defra.cloud`,
 
   // Connection to remote chromedriver
   hostname: process.env.CHROMEDRIVER_URL || '127.0.0.1',
   port: process.env.CHROMEDRIVER_PORT || 4444,
 
   // Tests to run
-  specs: ['./test/specs/**/*.js'],
+  specs: ['./test/specs/**/*.e2e.js'],
   // Tests to exclude
   exclude: [],
+  // Select with --suite smoke|full (also driven by CDP's PROFILE env var via entrypoint.sh)
+  suites: {
+    smoke: ['./test/specs/pre-signin/**/*.e2e.js'],
+    full: [
+      './test/specs/pre-signin/**/*.e2e.js',
+      './test/specs/post-signin/**/*.e2e.js'
+    ]
+  },
   maxInstances: 1,
 
   capabilities: [
