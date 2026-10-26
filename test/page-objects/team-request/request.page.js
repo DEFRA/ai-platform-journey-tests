@@ -33,7 +33,7 @@ class RequestPage extends Page {
    * @returns {Promise<string>}
    */
   async progressSignature(driver = browser) {
-    const items = await this.stepItems(driver)
+    const items = await this.stepItems(driver).getElements()
     const classes = await Promise.all(
       items.map((item) => item.getAttribute('class'))
     )
