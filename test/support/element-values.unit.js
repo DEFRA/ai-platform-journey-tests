@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import test from 'node:test'
 import { readEach } from './element-values.js'
 
 // Behaves like the array WebdriverIO's `getElements()` returns: its `map()`
@@ -10,30 +10,30 @@ function webdriverArray(items) {
   return elements
 }
 
-describe('readEach', () => {
-  it('returns the values as a real array, in order', async () => {
-    const elements = webdriverArray([
-      { getText: async () => 'one' },
-      { getText: async () => 'two' }
-    ])
+await test('readEach returns the values as a real array, in order', async () => {
+  const elements = webdriverArray([
+    { getText: async () => 'one' },
+    { getText: async () => 'two' }
+  ])
 
-    const values = await readEach(elements, (element) => element.getText())
+  const values = await readEach(elements, (element) => element.getText())
 
-    assert.ok(Array.isArray(values))
-    assert.deepEqual(values, ['one', 'two'])
-  })
+  assert.ok(Array.isArray(values))
+  assert.deepEqual(values, ['one', 'two'])
+})
 
-  it('returns an empty array when nothing was found', async () => {
-    assert.deepEqual(
-      await readEach(webdriverArray([]), (element) => element.getText()),
-      []
-    )
-  })
+await test('readEach returns an empty array when nothing was found', async () => {
+  const values = await readEach(webdriverArray([]), (element) =>
+    element.getText()
+  )
 
-  it('guards against the shape that broke Promise.all', async () => {
-    const elements = webdriverArray([{ getText: async () => 'one' }])
+  assert.deepEqual(values, [])
+})
 
-    // The array's own map() returns a promise, which Promise.all rejects.
-    await assert.rejects(Promise.all(elements.map(() => 'x')), TypeError)
-  })
+await test("the array's own map() returns a promise, not an array", async () => {
+  const mapped = webdriverArray([{ getText: async () => 'one' }]).map(() => 'x')
+
+  assert.equal(typeof mapped.then, 'function')
+  assert.equal(Array.isArray(mapped), false)
+  await mapped
 })
