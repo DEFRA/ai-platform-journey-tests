@@ -71,24 +71,32 @@ describe('Post-signin: progress of a request (AC10)', () => {
   it('shows a "Check progress" link without script, and does not refresh by itself', async function () {
     this.timeout(journeyData.deployTimeoutMs)
 
-    const { requestPath } = await requestModels({
-      teamSlug: journeyData.teamSlug,
-      modelSlugs: [journeyData.noScriptModelSlug],
-      purpose: 'Journey test: progress without script'
-    })
-
-    const session = await openWithoutScript(requestPath)
+    // Ready the script-free session first, so the request is not left running
+    // while Chrome starts: the page is only opened once the request exists.
+    const session = await openWithoutScript('/')
 
     try {
+      const { requestPath } = await requestModels({
+        teamSlug: journeyData.teamSlug,
+        modelSlugs: [journeyData.noScriptModelSlug],
+        purpose: 'Journey test: progress without script'
+      })
+
+      await session.url(new URL(requestPath, browser.options.baseUrl).href)
+
       // Script really is off, as GOV.UK Frontend sets this class from script.
       await expect(session.$('body')).not.toHaveElementClass('js-enabled')
 
       await expect(RequestPage.checkProgressLink(session)).toBeDisplayed()
       await expect(RequestPage.metaRefresh(session)).toBeElementsArrayOfSize(0)
 
-      // Nothing moves on its own, however long it is left.
+      // Nothing moves on its own, however long it is left. An unchanged
+      // signature would also hold after a reload that found nothing new, so
+      // check the page itself was never loaded again.
       const before = await RequestPage.progressSignature(session)
+      const held = await RequestPage.holdPageLoad(session)
       await sleep(NO_REFRESH_WAIT_MS)
+      expect(await RequestPage.isSamePageLoad(session, held)).toBe(true)
       expect(await RequestPage.progressSignature(session)).toBe(before)
 
       // Pressing the link shows where the request has got to.

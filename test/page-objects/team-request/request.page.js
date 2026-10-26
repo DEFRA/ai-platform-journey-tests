@@ -28,6 +28,38 @@ class RequestPage extends Page {
   }
 
   /**
+   * Takes hold of the page as loaded now. Script is off, so nothing can be
+   * written into the page: instead this keeps the browser's reference to the
+   * `<body>`, which belongs to this one load of the page.
+   * @param {WebdriverIO.Browser} driver
+   * @returns {Promise<string>} the reference, for `isSamePageLoad`
+   */
+  async holdPageLoad(driver) {
+    const body = await driver.$('body').getElement()
+
+    return body.elementId
+  }
+
+  /**
+   * True while the page is still the load that `holdPageLoad` took hold of.
+   * Any reload, by meta refresh, a Refresh header or script, replaces the
+   * document, so the old `<body>` reference goes stale and the browser
+   * refuses it.
+   * @param {WebdriverIO.Browser} driver
+   * @param {string} held - from `holdPageLoad`
+   * @returns {Promise<boolean>}
+   */
+  async isSamePageLoad(driver, held) {
+    try {
+      await driver.getElementTagName(held)
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /**
    * What the steps look like now: each step's state class, in order. A step
    * moving on changes it; the "last checked" time does not.
    * @param {WebdriverIO.Browser} [driver]
