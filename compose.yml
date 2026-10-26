@@ -24,6 +24,11 @@ services:
 # containers.
   selenium-chrome:
     image: selenium/standalone-chrome:123.0
+    environment:
+      # The no-script journey opens a second browser while the runner's stays
+      # open, so the node needs room for two sessions (the default is one).
+      - SE_NODE_MAX_SESSIONS=2
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
     ports:
       - 4444:4444
 

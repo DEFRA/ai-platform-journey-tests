@@ -72,7 +72,11 @@ for the variables.
   `[mock:checks-failed]` or `[mock:deploy-failed]` in the request's purpose, which
   only the backend's mock orchestrator (`TENANT_ORCHESTRATOR=mock`) honours.
 - The no-script journey opens a second Chrome session with script blocked and
-  carries the sign-in cookies over, because Entra's sign-in needs script.
+  carries the sign-in cookies over, because Entra's sign-in needs script. It
+  needs a browser server that allows two sessions at once: `compose.yml` sets
+  `SE_NODE_MAX_SESSIONS=2` for Selenium, and on BrowserStack it needs two
+  parallel sessions on the plan (the second reuses the runner's user, key and
+  `bstack:options`).
 - Every journey needs models the team does not have yet, so run against a fresh
   database (as compose does) or a fresh team.
 

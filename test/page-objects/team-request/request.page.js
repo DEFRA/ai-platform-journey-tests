@@ -1,5 +1,6 @@
 import { browser } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { readEach } from '#support/element-values'
 
 // The page that follows a team's request: `/connect/team/request/{team}/{id}`.
 // While the request is being set up it shows the steps of each model in a
@@ -34,10 +35,7 @@ class RequestPage extends Page {
    */
   async progressSignature(driver = browser) {
     const items = await this.stepItems(driver).getElements()
-    /** @type {string[]} */
-    const classes = await Promise.all(
-      items.map((item) => item.getAttribute('class'))
-    )
+    const classes = await readEach(items, (item) => item.getAttribute('class'))
 
     return classes.join('|')
   }

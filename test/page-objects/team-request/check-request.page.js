@@ -1,5 +1,6 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { readEach } from '#support/element-values'
 
 // "Check your answers": one summary, and one button, for every model chosen.
 class CheckRequestPage extends Page {
@@ -13,8 +14,7 @@ class CheckRequestPage extends Page {
 
   async summaryText() {
     const values = await this.summaryValues.getElements()
-    /** @type {string[]} */
-    const texts = await Promise.all(values.map((value) => value.getText()))
+    const texts = await readEach(values, (value) => value.getText())
 
     return texts.join('\n')
   }

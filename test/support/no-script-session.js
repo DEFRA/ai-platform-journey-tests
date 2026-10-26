@@ -28,7 +28,7 @@ function cookiesToCarry(cookies) {
  * @returns {Promise<WebdriverIO.Browser>}
  */
 export async function openWithoutScript(url) {
-  const { hostname, port, protocol, path, baseUrl } = browser.options
+  const { hostname, port, protocol, path, baseUrl, user, key } = browser.options
   const requested = browser.requestedCapabilities ?? {}
   const chromeOptions = requested['goog:chromeOptions'] ?? {}
   const cookies = await browser.getCookies()
@@ -38,10 +38,17 @@ export async function openWithoutScript(url) {
     port,
     protocol,
     path,
+    // A standalone session does not inherit the runner's credentials: on
+    // BrowserStack the hub refuses it without them.
+    ...(user && key && { user, key }),
     logLevel: 'error',
     capabilities: {
       browserName: 'chrome',
       ...(requested.proxy && { proxy: requested.proxy }),
+      // BrowserStack's platform, build and local-testing choices.
+      ...(requested['bstack:options'] && {
+        'bstack:options': requested['bstack:options']
+      }),
       'goog:chromeOptions': {
         args: chromeOptions.args ?? [],
         prefs: SCRIPT_BLOCKED_PREFS
