@@ -33,9 +33,15 @@ class SelectModelsPage extends Page {
   async chooseAll(slugs) {
     const names = []
 
-    for (const slug of slugs) {
-      names.push(await this.tick(slug))
-    }
+    // One tick at a time, in order, on the one browser session: chained
+    // rather than awaited in a loop (Sonar S9382).
+    await slugs.reduce(
+      (previous, slug) =>
+        previous.then(async () => {
+          names.push(await this.tick(slug))
+        }),
+      Promise.resolve()
+    )
 
     await this.continueButton.click()
 

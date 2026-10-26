@@ -13,6 +13,7 @@ class CheckRequestPage extends Page {
 
   async summaryText() {
     const values = await this.summaryValues.getElements()
+    /** @type {string[]} */
     const texts = await Promise.all(values.map((value) => value.getText()))
 
     return texts.join('\n')
