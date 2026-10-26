@@ -98,6 +98,12 @@ services:
       - ./docker/config/example-backend.env
     environment:
       - PORT=3001
+      # Team requests go through the mock orchestrator: no GitHub, SQS or
+      # worker is needed, and each stage takes a few seconds so a journey can
+      # watch a request move. It also honours the forced-failure marker in a
+      # request's purpose that the failure journeys use.
+      - TENANT_ORCHESTRATOR=mock
+      - TEAM_DEPLOYMENT_MOCK_STAGE_DURATION_MS=3000
     depends_on:
       mongodb:
         condition: service_healthy
