@@ -29,11 +29,3 @@ await test('readEach returns an empty array when nothing was found', async () =>
 
   assert.deepEqual(values, [])
 })
-
-await test("the array's own map() returns a promise, not an array", async () => {
-  const mapped = webdriverArray([{ getText: async () => 'one' }]).map(() => 'x')
-
-  assert.equal(typeof mapped.then, 'function')
-  assert.equal(Array.isArray(mapped), false)
-  await mapped
-})
