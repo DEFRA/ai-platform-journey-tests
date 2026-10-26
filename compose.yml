@@ -24,6 +24,11 @@ services:
 # containers.
   selenium-chrome:
     image: selenium/standalone-chrome:123.0
+    environment:
+      # The no-script journey opens a second browser while the runner's stays
+      # open, so the node needs room for two sessions (the default is one).
+      - SE_NODE_MAX_SESSIONS=2
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
     ports:
       - 4444:4444
 
@@ -98,6 +103,12 @@ services:
       - ./docker/config/example-backend.env
     environment:
       - PORT=3001
+      # Team requests go through the mock orchestrator: no GitHub, SQS or
+      # worker is needed, and each stage takes a few seconds so a journey can
+      # watch a request move. It also honours the forced-failure marker in a
+      # request's purpose that the failure journeys use.
+      - TENANT_ORCHESTRATOR=mock
+      - TEAM_DEPLOYMENT_MOCK_STAGE_DURATION_MS=3000
     depends_on:
       mongodb:
         condition: service_healthy

@@ -59,6 +59,37 @@ JOURNEY_TEST_USER_PASSWORD=<test account password>
 npm run test:local
 ```
 
+### B28 team-request journeys
+
+`test/specs/post-signin/team-request/` holds the journeys for asking for models
+(B28, asynchronous GitOps operations): several models in one request, progress
+with and without script, and a request that fails its checks or its deploy.
+They are opt-in: they skip unless `JOURNEY_TEST_TEAM_SLUG` is set, so a Portal
+run never requests models by accident. See [.env.local.example](.env.local.example)
+for the variables.
+
+- The failure journeys also need `JOURNEY_TEST_MOCK_ORCHESTRATOR=true`. They put
+  `[mock:checks-failed]` or `[mock:deploy-failed]` in the request's purpose, which
+  only the backend's mock orchestrator (`TENANT_ORCHESTRATOR=mock`) honours.
+- The no-script journey opens a second Chrome session with script blocked and
+  carries the sign-in cookies over, because Entra's sign-in needs script. It
+  needs a browser server that allows two sessions at once: `compose.yml` sets
+  `SE_NODE_MAX_SESSIONS=2` for Selenium, and on BrowserStack it needs two
+  parallel sessions on the plan (the second reuses the runner's user, key and
+  `bstack:options`).
+- Every journey needs models the team does not have yet, so run against a fresh
+  database (as compose does) or a fresh team.
+
+To run against images built from local branches, use the override file:
+
+```bash
+docker compose -f compose.yml -f compose.local.yml up --wait -d
+```
+
+Note that the compose frontend has no real Entra tenant, so the sign-in step
+cannot complete there; these journeys need a frontend that can sign a test user
+in (a deployed environment, or the frontend's `dev:mock-oidc` provider).
+
 On CDP Portal, the same split is selected via the `full`/`smoke` WDIO suites and the `PROFILE`
 field on a manual test run (`smoke` = pre-signin only, `full` = both - see
 [wdio.conf.js](wdio.conf.js)); the credentials there come from the Portal's per-environment
