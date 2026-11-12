@@ -43,10 +43,11 @@ async function teamSlugFromAddress() {
   return slug
 }
 
-// From the chosen environment's own page: the overview's button names no
-// environment, so the portal would pick its first one.
+// From the chosen environment's page: the overview's own "Deploy a model" link
+// names no environment, so the portal would pick its first one.
 async function deployModel(teamSlug, purpose) {
-  await EnvironmentPage.open(teamSlug, ENVIRONMENT)
+  await OverviewPage.open(teamSlug)
+  await OverviewPage.cardLink(ENVIRONMENT).click()
   await EnvironmentPage.deployButton.click()
 
   await DeployModelPage.chooseModel(MODEL_SLUG)
