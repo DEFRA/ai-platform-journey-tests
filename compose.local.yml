@@ -1,0 +1,21 @@
+################################################################################
+# Local override: run the journeys against images built from local branches,
+# for example the B28 PR-6 (backend) and PR-7 (frontend) branches, before they
+# are published.
+#
+#   docker build -t ai-platform-backend-api:local  ../ai-platform-backend-api
+#   docker build -t ai-platform-frontend:local     ../ai-platform-frontend
+#   docker compose -f compose.yml -f compose.local.yml up --wait -d
+#
+# Use other images with AI_PLATFORM_FRONTEND_IMAGE and
+# AI_PLATFORM_BACKEND_API_IMAGE (a full image name and tag). compose.yml
+# already makes the backend use the mock orchestrator.
+################################################################################
+services:
+  ai-platform-frontend:
+    image: ${AI_PLATFORM_FRONTEND_IMAGE:-ai-platform-frontend:local}
+    pull_policy: never
+
+  ai-platform-backend-api:
+    image: ${AI_PLATFORM_BACKEND_API_IMAGE:-ai-platform-backend-api:local}
+    pull_policy: never
