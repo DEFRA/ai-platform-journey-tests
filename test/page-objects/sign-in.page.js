@@ -3,7 +3,16 @@ import { Page } from '#page-objects/page'
 
 // Drives the real Entra ID hosted login form - only works against a deployed
 // environment with a real tenant; requires a dedicated test account (no MFA).
+//
+// With JOURNEY_TEST_SIGN_IN=mock it instead follows the frontend's mock OIDC
+// provider (npm run dev:mock-oidc in ai-platform-frontend), which approves the
+// one fixed mock user at once and shows no form. Local runs against a stack
+// started with OIDC_MOCK_ISSUER_URL use this; deployed environments never do.
 class SignInPage extends Page {
+  get signOutButton() {
+    return $('.app-sign-in-out__button')
+  }
+
   get emailField() {
     return $('input[name="loginfmt"]')
   }
@@ -25,6 +34,23 @@ class SignInPage extends Page {
   }
 
   async signIn() {
+    if (process.env.JOURNEY_TEST_SIGN_IN === 'mock') {
+      return this.signInWithMockProvider()
+    }
+
+    return this.signInWithEntra()
+  }
+
+  async signInWithMockProvider() {
+    await super.open('/sign-in')
+
+    await this.signOutButton.waitForDisplayed({
+      timeout: 15000,
+      timeoutMsg: 'Expected the mock provider to sign the user in'
+    })
+  }
+
+  async signInWithEntra() {
     const email = process.env.JOURNEY_TEST_USER_EMAIL
     const password = process.env.JOURNEY_TEST_USER_PASSWORD
 

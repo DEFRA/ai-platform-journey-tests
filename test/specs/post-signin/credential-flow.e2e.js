@@ -6,12 +6,16 @@ import ConnectModelPage from '#page-objects/connect/model.page'
 import DetailsPage from '#page-objects/connect/details.page'
 import CheckPage from '#page-objects/connect/check.page'
 import CredentialPage from '#page-objects/connect/credential.page'
+import ServiceNavigation from '#components/service-navigation.component'
 
 const MODEL_SLUG = process.env.JOURNEY_TEST_MODEL_SLUG || 'gpt-4o'
 
 describe('Post-signin: research tier credential flow', () => {
   it('signs in, requests a shared credential and reveals the key once', async () => {
     await SignInPage.signIn()
+
+    await expect(ServiceNavigation.link('Personal access')).toBeDisplayed()
+    await expect(ServiceNavigation.link('Environments')).toBeDisplayed()
 
     await AccessTypePage.open(MODEL_SLUG)
     await AccessTypePage.chooseShared()

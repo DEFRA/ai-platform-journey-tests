@@ -2,6 +2,7 @@ import { browser, expect } from '@wdio/globals'
 
 import HomePage from '#page-objects/home.page'
 import ModelsPage from '#page-objects/models.page'
+import ServiceNavigation from '#components/service-navigation.component'
 
 const MODEL_SLUG = process.env.JOURNEY_TEST_MODEL_SLUG || 'gpt-4o'
 
@@ -12,9 +13,26 @@ describe('Pre-signin: home and model browsing', () => {
     await expect(HomePage.pageHeading).toBeDisplayed()
   })
 
+  it('shows only the Model catalogue, Help and Sign in links before signing in', async () => {
+    await HomePage.open()
+    await expect(await ServiceNavigation.linkTexts()).toEqual([
+      'Model catalogue',
+      'Help',
+      'Sign in'
+    ])
+  })
+
   it('lists models without needing to sign in', async () => {
     await ModelsPage.open()
+    await expect(ModelsPage.pageHeading).toHaveText('Model catalogue')
     await expect(ModelsPage.modelLink(MODEL_SLUG)).toBeDisplayed()
+  })
+
+  it('opens the Model catalogue from the navigation', async () => {
+    await HomePage.open()
+    await ServiceNavigation.link('Model catalogue').click()
+    await expect(browser).toHaveUrl(expect.stringContaining('/models'))
+    await expect(ModelsPage.pageHeading).toHaveText('Model catalogue')
   })
 
   it('shows a model detail page', async () => {

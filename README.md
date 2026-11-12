@@ -59,6 +59,22 @@ JOURNEY_TEST_USER_PASSWORD=<test account password>
 npm run test:local
 ```
 
+To run the post-signin specs without a real tenant, start the frontend with its mock OpenID
+provider (`npm run dev:mock-oidc` and `OIDC_MOCK_ISSUER_URL`, see the frontend README), the backend
+with `TENANT_ORCHESTRATOR=mock` and `PORTAL_AUTH_MOCK_ISSUER_URL`, and set
+`JOURNEY_TEST_SIGN_IN=mock`. The mock signs in one fixed user at once, so no test account is needed:
+
+```bash
+JOURNEY_TEST_SIGN_IN=mock npx wdio run wdio.local.conf.js --spec test/specs/post-signin/environments.e2e.js
+```
+
+`environments.e2e.js` (Environments and deployments) creates its own two teams each run (names carry
+a time stamp), deploys a model to one, deploys with `[mock:checks-failed]` in the purpose to the other,
+and changes limits, so the backend must offer a team model in `JOURNEY_TEST_ENVIRONMENT` (default
+`infradev`; the model is `JOURNEY_TEST_TEAM_MODEL_SLUG`, default `gpt-4o`, shown as
+`JOURNEY_TEST_TEAM_MODEL_NAME`, default `GPT-4o`). The `[mock:...]` markers only work with
+`TENANT_ORCHESTRATOR=mock`, so that test only runs with `JOURNEY_TEST_SIGN_IN=mock` (the local stack).
+
 On CDP Portal, the same split is selected via the `full`/`smoke` WDIO suites and the `PROFILE`
 field on a manual test run (`smoke` = pre-signin only, `full` = both - see
 [wdio.conf.js](wdio.conf.js)); the credentials there come from the Portal's per-environment
