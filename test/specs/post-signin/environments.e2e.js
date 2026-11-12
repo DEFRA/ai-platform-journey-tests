@@ -43,16 +43,22 @@ async function teamSlugFromAddress() {
   return slug
 }
 
+// From the chosen environment's own page: the overview's button names no
+// environment, so the portal would pick its first one.
 async function deployModel(teamSlug, purpose) {
-  await OverviewPage.open(teamSlug)
-  await OverviewPage.deployButton.click()
+  await EnvironmentPage.open(teamSlug, ENVIRONMENT)
+  await EnvironmentPage.deployButton.click()
 
   await DeployModelPage.chooseModel(MODEL_SLUG)
   await DeployModelPage.describe(purpose)
   await DeployModelPage.requestAccess()
 }
 
-describe('Post-signin: environments and deployments', () => {
+describe('Post-signin: environments and deployments', function () {
+  // A test may wait up to CHANGE_TIMEOUT for a change, longer than the shared
+  // 60 s Mocha timeout; set here, never lowering a longer one (debug runs).
+  this.timeout(Math.max(this.timeout(), CHANGE_TIMEOUT + 60000))
+
   let readySlug
   let failingSlug
 
