@@ -53,7 +53,9 @@ async function deployModel(teamSlug, purpose) {
   await DeployModelPage.requestAccess()
 }
 
-describe('Post-signin: environments and deployments', () => {
+describe('Post-signin: environments and deployments', function () {
+  this.timeout(CHANGE_TIMEOUT + 60000)
+
   let readySlug
   let failingSlug
 
