@@ -45,7 +45,8 @@ async function teamSlugFromAddress() {
 
 async function deployModel(teamSlug, purpose) {
   await OverviewPage.open(teamSlug)
-  await OverviewPage.deployButton.click()
+  await OverviewPage.cardLink(ENVIRONMENT).click()
+  await EnvironmentPage.deployButton.click()
 
   await DeployModelPage.chooseModel(MODEL_SLUG)
   await DeployModelPage.describe(purpose)
