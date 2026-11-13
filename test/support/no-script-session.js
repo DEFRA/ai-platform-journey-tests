@@ -50,7 +50,13 @@ export async function openWithoutScript(url) {
         'bstack:options': requested['bstack:options']
       }),
       'goog:chromeOptions': {
-        args: chromeOptions.args ?? [],
+        // A local run starts Chrome from a browser the runner downloaded: the
+        // second session needs the same binary, but never the same profile,
+        // which the first Chrome holds.
+        ...(chromeOptions.binary && { binary: chromeOptions.binary }),
+        args: (chromeOptions.args ?? []).filter(
+          (arg) => !String(arg).startsWith('--user-data-dir')
+        ),
         prefs: SCRIPT_BLOCKED_PREFS
       }
     }

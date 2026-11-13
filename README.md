@@ -106,6 +106,37 @@ Note that the compose frontend has no real Entra tenant, so the sign-in step
 cannot complete there; these journeys need a frontend that can sign a test user
 in (a deployed environment, or the frontend's `dev:mock-oidc` provider).
 
+### Platform Admin journeys (`test/specs/post-signin/admin/`)
+
+`access`, `teams`, `members`, `audit` and `no-script` cover the Admin area: who can use it, finding and opening a
+team, adding and removing members, the audit log, and the search forms with script switched off. They run only with `JOURNEY_TEST_SIGN_IN=mock`
+(otherwise they are skipped) because they set up what the portal pages cannot:
+
+- The mock signs in one person, so "a person who is not a Platform Admin" is that same person with the
+  `platform-admin` role taken away. The harness (`test/support/mock-stack.js`) adds or removes the role
+  and sets a team's status directly in the **local** MongoDB, then signs in again; it refuses to run
+  unless `JOURNEY_TEST_SIGN_IN=mock`. It never touches a deployed environment.
+- `JOURNEY_TEST_MONGO_URI` (default `mongodb://127.0.0.1:27017/`) and `JOURNEY_TEST_MONGO_DATABASE`
+  (default `ai-platform-backend-api`) point at the database the backend under test uses. Set the
+  database when the backend is started with its own `MONGO_DATABASE`. `JOURNEY_TEST_MOCK_OID` is the
+  mock person's object ID if the mock provider is started with another.
+- The backend must trust the mock provider (`PORTAL_AUTH_MOCK_ISSUER_URL`). The backend's compose file
+  leaves it empty unless you set it, so set it before `docker compose up`, or run the backend with Node
+  against the same MongoDB.
+- `JOURNEY_TEST_AUDIT_RETENTION_DAYS` is the backend's `AUDIT_RETENTION_DAYS` (default `30`).
+- To run beside another stack on port 3000, start the mock provider with `MOCK_OIDC_PORT` and
+  `MOCK_OIDC_REDIRECT_URI` (and `MOCK_OIDC_POST_LOGOUT_REDIRECT_URI`) for your frontend's port, the
+  frontend with `APP_BASE_URL` and `OIDC_MOCK_ISSUER_URL`, the backend with the same
+  `PORTAL_AUTH_MOCK_ISSUER_URL`, and pass `--baseUrl http://localhost:<frontend port>` to `wdio`.
+
+```bash
+JOURNEY_TEST_SIGN_IN=mock npx wdio run wdio.local.conf.js --spec "test/specs/post-signin/admin/*.e2e.js"
+```
+
+Each run creates its own teams (names carry a time stamp) and uses fictional people from the backend's
+mock directory. The specs share one signed-in person and change their role, so run them one at a time
+(`maxInstances: 1`, the default here). Real Entra accounts for CDP dev are not set up yet.
+
 On CDP Portal, the same split is selected via the `full`/`smoke` WDIO suites and the `PROFILE`
 field on a manual test run (`smoke` = pre-signin only, `full` = both - see
 [wdio.conf.js](wdio.conf.js)); the credentials there come from the Portal's per-environment
