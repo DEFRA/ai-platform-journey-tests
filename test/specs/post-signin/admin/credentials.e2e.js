@@ -244,7 +244,7 @@ describeOnMockStack(
         // Disable credentials is the way to stop calls now.
         await expect(AdminReasonPage.effect).toHaveText(
           expect.stringContaining(
-            'A token already issued with it keeps working for up to 90 minutes.'
+            'A token already issued with it keeps working until it expires, up to 2 hours.'
           )
         )
         await expect(AdminReasonPage.effect).toHaveText(

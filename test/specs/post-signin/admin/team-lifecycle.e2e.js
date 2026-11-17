@@ -306,10 +306,13 @@ describeOnMockStack(
         await AdminChooseEnvironmentsPage.submitButton.click()
 
         await expect(AdminTeamPage.pageHeading).toHaveText(team.name)
+        // The team was enabled by the test before, so Enable only unlocks the
+        // environment and does not say "Team enabled".
         await expect(AdminTeamPage.notification).toHaveText(
-          expect.stringContaining(
-            `Team enabled and ${ENVIRONMENT_LABEL} unlocked.`
-          )
+          expect.stringContaining(`${ENVIRONMENT_LABEL} unlocked.`)
+        )
+        await expect(AdminTeamPage.notification).not.toHaveText(
+          expect.stringContaining('Team enabled')
         )
         await expect(AdminTeamPage.summaryValue('Status')).toHaveText('Active')
         await expect(AdminTeamPage.disabledWarning).not.toBeExisting()
