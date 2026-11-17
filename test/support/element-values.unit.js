@@ -31,10 +31,15 @@ await test('readEach returns an empty array when nothing was found', async () =>
 })
 
 await test('forEachInOrder starts each action only once the one before has finished', async () => {
+  // The first action is the slower one, so running both together would
+  // finish the second first.
+  const firstActionMs = 20
   const events = []
   const act = async (name) => {
     events.push(`start ${name}`)
-    await new Promise((resolve) => setTimeout(resolve, name === 'one' ? 20 : 0))
+    await new Promise((resolve) =>
+      setTimeout(resolve, name === 'one' ? firstActionMs : 0)
+    )
     events.push(`end ${name}`)
   }
 
