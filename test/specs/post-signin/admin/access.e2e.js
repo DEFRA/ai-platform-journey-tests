@@ -4,6 +4,7 @@ import ServiceNavigation from '#components/service-navigation.component'
 import AdminTabs from '#components/admin-tabs.component'
 import ErrorPage from '#page-objects/error.page'
 import AdminTeamsPage from '#page-objects/admin/teams.page'
+import AdminDeploymentsPage from '#page-objects/admin/deployments.page'
 import AdminAuditPage from '#page-objects/admin/audit.page'
 import { signInAs, removePlatformAdminRole } from '#support/admin-session'
 import { isMockStack } from '#support/mock-stack'
@@ -30,9 +31,19 @@ describeOnMockStack('Platform Admin: who can use the Admin area', () => {
       await expect(browser).toHaveUrl(expect.stringContaining('/admin/teams'))
       await expect(AdminTeamsPage.pageHeading).toHaveText('Teams')
       await expect(await AdminTabs.tabTexts()).toEqual(
-        expect.arrayContaining(['Teams', 'Audit log'])
+        expect.arrayContaining(['Teams', 'Deployments', 'Audit log'])
       )
       await expect(AdminTabs.currentTab).toHaveText('Teams')
+    })
+
+    it('moves to the Deployments tab and marks it as the current one', async () => {
+      await AdminTabs.tab('Deployments').click()
+
+      await expect(browser).toHaveUrl(
+        expect.stringContaining('/admin/deployments')
+      )
+      await expect(AdminDeploymentsPage.pageHeading).toHaveText('Deployments')
+      await expect(AdminTabs.currentTab).toHaveText('Deployments')
     })
 
     it('moves to the Audit log tab and marks it as the current one', async () => {
@@ -55,8 +66,11 @@ describeOnMockStack('Platform Admin: who can use the Admin area', () => {
 
     for (const [page, path] of [
       ['the Teams tab', '/admin/teams'],
+      ['the Deployments tab', '/admin/deployments'],
       ['the Audit log tab', '/admin/audit'],
       ['a team page', '/admin/teams/no-such-team'],
+      ['a deployment', '/admin/deployments/000000000000000000000000/infradev'],
+      ['the Disable team page', '/admin/teams/no-such-team/disable'],
       ['the add a member page', '/admin/teams/no-such-team/members/add']
     ]) {
       it(`is refused ${page} with the page that says who can use it`, async () => {
