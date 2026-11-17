@@ -109,13 +109,23 @@ in (a deployed environment, or the frontend's `dev:mock-oidc` provider).
 ### Platform Admin journeys (`test/specs/post-signin/admin/`)
 
 `access`, `teams`, `members`, `audit` and `no-script` cover the Admin area: who can use it, finding and opening a
-team, adding and removing members, the audit log, and the search forms with script switched off. They run only with `JOURNEY_TEST_SIGN_IN=mock`
-(otherwise they are skipped) because they set up what the portal pages cannot:
+team, adding and removing members, the audit log, and the search forms with script switched off. `deployments`,
+`credentials` and `team-lifecycle` cover the Deployments tab (the list with its environment tabs and filters, a
+deployment's health, Reconcile and Retry), Disable and Enable credentials, revoking one client secret, and Disable
+team and Enable team with what a team member then sees, each with the audit rows it leaves. They run only with
+`JOURNEY_TEST_SIGN_IN=mock` (otherwise they are skipped) because they set up what the portal pages cannot:
 
 - The mock signs in one person, so "a person who is not a Platform Admin" is that same person with the
   `platform-admin` role taken away. The harness (`test/support/mock-stack.js`) adds or removes the role
-  and sets a team's status directly in the **local** MongoDB, then signs in again; it refuses to run
-  unless `JOURNEY_TEST_SIGN_IN=mock`. It never touches a deployed environment.
+  in the **local** MongoDB, then signs in again; it refuses to run
+  unless `JOURNEY_TEST_SIGN_IN=mock`. It never touches a deployed environment. It also marks a team Pending
+  removal, the one state no page makes yet (Delete team is deferred): a team is disabled and enabled through the
+  Platform Admin's own pages (`test/support/team-lifecycle.js`).
+- Teams, deployments and client secrets are made through the portal's own pages (`test/support/deployments.js`
+  deploys a model in the environment, the mock orchestrator ends it as the purpose says, and adds a client secret).
+  The backend must run with `TENANT_ORCHESTRATOR=mock` and `PROVISIONING_MODE=mock`: with a live provisioning mode a
+  deployment waits on real Azure checks and never finishes. `JOURNEY_TEST_ENVIRONMENT` (default `infradev`) and
+  `JOURNEY_TEST_ENVIRONMENT_LABEL` (default `Development`, what the portal calls it) name the environment.
 - `JOURNEY_TEST_MONGO_URI` (default `mongodb://127.0.0.1:27017/`) and `JOURNEY_TEST_MONGO_DATABASE`
   (default `ai-platform-backend-api`) point at the database the backend under test uses. Set the
   database when the backend is started with its own `MONGO_DATABASE`. `JOURNEY_TEST_MOCK_OID` is the
@@ -135,7 +145,8 @@ JOURNEY_TEST_SIGN_IN=mock npx wdio run wdio.local.conf.js --spec "test/specs/pos
 
 Each run creates its own teams (names carry a time stamp) and uses fictional people from the backend's
 mock directory. The specs share one signed-in person and change their role, so run them one at a time
-(`maxInstances: 1`, the default here). Real Entra accounts for CDP dev are not set up yet.
+(`maxInstances: 1`, the default here). Give `--spec` one glob, as above: several `--spec` flags start a
+worker for each, and two specs then fight over the role. Real Entra accounts for CDP dev are not set up yet.
 
 On CDP Portal, the same split is selected via the `full`/`smoke` WDIO suites and the `PROFILE`
 field on a manual test run (`smoke` = pre-signin only, `full` = both - see
