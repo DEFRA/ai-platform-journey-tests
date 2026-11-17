@@ -5,7 +5,8 @@ import AdminTeamPage from '#page-objects/admin/team.page'
 import AdminTeamsPage from '#page-objects/admin/teams.page'
 import ErrorPage from '#page-objects/error.page'
 import { signInAs } from '#support/admin-session'
-import { isMockStack, setTeamStatus } from '#support/mock-stack'
+import { isMockStack, markTeamPendingRemoval } from '#support/mock-stack'
+import { disableTeam } from '#support/team-lifecycle'
 import { createTeam } from '#support/teams'
 
 const describeOnMockStack = isMockStack() ? describe : describe.skip
@@ -26,8 +27,10 @@ describeOnMockStack('Platform Admin: finding a team and opening it', () => {
     await signInAs('admin')
 
     await createTeam(active)
-    await setTeamStatus(await createTeam(disabled), 'disabled')
-    await setTeamStatus(await createTeam(pendingRemoval), 'pending-removal')
+    // Disabled through the Platform Admin's own pages; only Pending removal is
+    // written directly, because Delete team is deferred and has no page.
+    await disableTeam(await createTeam(disabled))
+    await markTeamPendingRemoval(await createTeam(pendingRemoval))
   })
 
   it('lists teams by name with their status, environments and members', async () => {

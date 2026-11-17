@@ -4,7 +4,8 @@ import AdminAddMemberPage from '#page-objects/admin/add-member.page'
 import AdminRemoveMemberPage from '#page-objects/admin/remove-member.page'
 import AdminTeamPage from '#page-objects/admin/team.page'
 import { signInAs } from '#support/admin-session'
-import { isMockStack, setTeamStatus } from '#support/mock-stack'
+import { isMockStack, markTeamPendingRemoval } from '#support/mock-stack'
+import { disableTeam } from '#support/team-lifecycle'
 import { createTeam, newTeamNamed } from '#support/teams'
 
 const describeOnMockStack = isMockStack() ? describe : describe.skip
@@ -188,7 +189,13 @@ describeOnMockStack(
         it('still lets a Platform Admin add and remove members', async () => {
           const stopped = newTeamNamed(`stopped ${status}`, 'JTS')
           const slug = await createTeam(stopped)
-          await setTeamStatus(slug, status)
+
+          // Disabled through the real pages; Pending removal has no page yet.
+          if (status === 'disabled') {
+            await disableTeam(slug)
+          } else {
+            await markTeamPendingRemoval(slug)
+          }
 
           await AdminAddMemberPage.open(slug)
           await AdminAddMemberPage.add({ ...MEMBER, role: 'user' })

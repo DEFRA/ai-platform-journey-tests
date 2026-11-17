@@ -8,6 +8,12 @@ class ErrorPage extends Page {
     return $('main .govuk-body')
   }
 
+  // The plain paragraph of the portal's general error page (not the Admin
+  // area's refusal page, whose text is in `message`).
+  get plainMessage() {
+    return $('main .govuk-grid-column-two-thirds > p')
+  }
+
   get actionLink() {
     return $('main a.govuk-button')
   }

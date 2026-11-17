@@ -2,7 +2,8 @@ import process from 'node:process'
 import { MongoClient } from 'mongodb'
 
 // Setup for journeys that need data the portal pages cannot create: who holds
-// the Platform Admin role, and a team's status. It talks to the local stack's
+// the Platform Admin role, and a team that is pending removal (Delete team is
+// deferred, so no page makes one). It talks to the local stack's
 // MongoDB directly and only when the stack signs in with the mock provider
 // (JOURNEY_TEST_SIGN_IN=mock). It never runs against a deployed environment.
 //
@@ -13,14 +14,13 @@ import { MongoClient } from 'mongodb'
 const MOCK_USER_OID =
   process.env.JOURNEY_TEST_MOCK_OID || '11111111-1111-4111-8111-111111111111'
 const PLATFORM_ADMIN_ROLE = 'platform-admin'
+const PENDING_REMOVAL = 'pending-removal'
 const MONGO_URI =
   process.env.JOURNEY_TEST_MONGO_URI || 'mongodb://127.0.0.1:27017/'
 // The backend's own default database; set when the backend is started with its own.
 const MONGO_DATABASE =
   process.env.JOURNEY_TEST_MONGO_DATABASE || 'ai-platform-backend-api'
 const SERVER_SELECTION_TIMEOUT_MS = 5000
-
-export const TEAM_STATUSES = ['active', 'disabled', 'pending-removal']
 
 export function isMockStack() {
   return process.env.JOURNEY_TEST_SIGN_IN === 'mock'
@@ -82,18 +82,16 @@ export async function setMockUserPlatformAdmin(isAdmin) {
 }
 
 /**
- * Sets a team's status, the way the Disable and Delete pages will once they
- * exist (`teams.status`).
+ * Marks a team as pending removal, the one state the portal cannot put a team
+ * in yet (Delete team is deferred, so there is no page for it). Disabling and
+ * enabling a team go through the Platform Admin's real pages, not this.
  * @param {string} slug
- * @param {'active' | 'disabled' | 'pending-removal'} status
  */
-export async function setTeamStatus(slug, status) {
-  if (!TEAM_STATUSES.includes(status)) {
-    throw new Error(`Unknown team status: ${status}`)
-  }
-
+export async function markTeamPendingRemoval(slug) {
   const { matchedCount } = await withDatabase((db) =>
-    db.collection('teams').updateOne({ slug }, { $set: { status } })
+    db
+      .collection('teams')
+      .updateOne({ slug }, { $set: { status: PENDING_REMOVAL } })
   )
 
   if (matchedCount !== 1) {

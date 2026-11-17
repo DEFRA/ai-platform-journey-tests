@@ -28,6 +28,25 @@ class AdminTeamPage extends Page {
     return $('[data-testid="team-notification"]')
   }
 
+  get disableTeamButton() {
+    return $('[data-testid="disable-team"]')
+  }
+
+  get enableTeamButton() {
+    return $('[data-testid="enable-team"]')
+  }
+
+  // The warning shown while the team or one of its environments is disabled.
+  get disabledWarning() {
+    return $('[data-testid="team-disabled-warning"]')
+  }
+
+  // The "Disabled" tags: the team's own status tag is in the summary, and one
+  // sits beside each environment that was disabled with it.
+  get environmentDisabledTags() {
+    return $$('[data-testid="environment-disabled"]')
+  }
+
   get memberRows() {
     return $$('[data-testid="member-row"]')
   }
