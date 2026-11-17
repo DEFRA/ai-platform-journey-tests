@@ -240,17 +240,16 @@ describeOnMockStack(
         await expect(AdminReasonPage.effect).toHaveText(
           expect.stringContaining('The team’s other secrets are not changed.')
         )
-        // What revoking does not do: a token already issued keeps working, and
-        // Disable credentials is the way to stop calls now.
+        // What revoking does not do: a token already issued keeps working.
         await expect(AdminReasonPage.effect).toHaveText(
           expect.stringContaining(
             'A token already issued with it keeps working until it expires, up to 2 hours.'
           )
         )
-        await expect(AdminReasonPage.effect).toHaveText(
-          expect.stringContaining(
-            'To stop calls now, also use Disable credentials on this deployment.'
-          )
+        // Disable credentials has no gateway effect until S2, so the page does
+        // not offer it as a way to stop calls.
+        await expect(AdminReasonPage.effect).not.toHaveText(
+          expect.stringContaining('Disable credentials')
         )
 
         await AdminReasonPage.submitWith('')
