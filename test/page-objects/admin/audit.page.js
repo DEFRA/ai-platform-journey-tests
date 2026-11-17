@@ -1,5 +1,6 @@
 import { $, $$, browser } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { forEachInOrder, readEach } from '#support/element-values'
 
 // The Admin area's Audit log tab: every event, newest first, with filters.
 class AdminAuditPage extends Page {
@@ -89,9 +90,9 @@ class AdminAuditPage extends Page {
       actorType: this.actorTypeSelect
     }
 
-    for (const [name, value] of Object.entries(selects)) {
-      await selectFor[name].selectByAttribute('value', value)
-    }
+    await forEachInOrder(Object.entries(selects), ([name, value]) =>
+      selectFor[name].selectByAttribute('value', value)
+    )
 
     if (person !== undefined) {
       await this.personField.setValue(person)
@@ -118,46 +119,33 @@ class AdminAuditPage extends Page {
   // Each row as the page shows it: When, Who (name and type), Action (with any
   // reason or person affected beneath), Team, Environment and Outcome.
   async events() {
-    const events = []
+    const rows = await this.rows.getElements()
 
-    for (const row of await this.rows.getElements()) {
-      const texts = []
+    return readEach(rows, async (row) => {
+      const cells = await row.$$('td').getElements()
+      const texts = await readEach(cells, (cell) => cell.getText())
+      const [when, who, action, team, environment, outcome] = texts.map(
+        (text) => text.trim()
+      )
 
-      for (const cell of await row.$$('td').getElements()) {
-        texts.push((await cell.getText()).trim())
-      }
-
-      const [when, who, action, team, environment, outcome] = texts
-
-      events.push({ when, who, action, team, environment, outcome })
-    }
-
-    return events
+      return { when, who, action, team, environment, outcome }
+    })
   }
 
   // Each event's time as the page marks it up (ISO), in the order shown.
   async times() {
-    const times = []
-
     const timeElements = await $$(
       '[data-testid="audit-row"] time'
     ).getElements()
 
-    for (const time of timeElements) {
-      times.push(await time.getAttribute('datetime'))
-    }
-
-    return times
+    return readEach(timeElements, (time) => time.getAttribute('datetime'))
   }
 
   async teamOptions() {
-    const options = []
+    const options = await this.teamSelect.$$('option').getElements()
+    const texts = await readEach(options, (option) => option.getText())
 
-    for (const option of await this.teamSelect.$$('option').getElements()) {
-      options.push((await option.getText()).trim())
-    }
-
-    return options
+    return texts.map((text) => text.trim())
   }
 }
 

@@ -1,5 +1,6 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { forEachInOrder, readEach } from '#support/element-values'
 
 // "Which environments?": the first step of Disable credentials, Disable team and
 // Enable team (and Enable credentials), one checkbox for each environment on offer.
@@ -48,28 +49,33 @@ class AdminChooseEnvironmentsPage extends Page {
 
   // The environments ticked, by the label beside each.
   async tickedLabels() {
-    const labels = []
-
-    for (const box of await this.checkboxes.getElements()) {
-      if (await box.isSelected()) {
-        const id = await box.getAttribute('id')
-
-        labels.push((await $(`label[for="${id}"]`).getText()).trim())
+    const boxes = await this.checkboxes.getElements()
+    const labels = await readEach(boxes, async (box) => {
+      if (!(await box.isSelected())) {
+        return null
       }
-    }
 
-    return labels
+      const id = await box.getAttribute('id')
+
+      return (await $(`label[for="${id}"]`).getText()).trim()
+    })
+
+    return labels.filter((label) => label !== null)
   }
 
   // Ticks exactly the environments named (by code), unticking any other.
   async choose(codes) {
-    for (const box of await this.checkboxes.getElements()) {
+    const boxes = await this.checkboxes.getElements()
+    const toChange = await readEach(boxes, async (box) => {
       const wanted = codes.includes(await box.getAttribute('value'))
 
-      if ((await box.isSelected()) !== wanted) {
-        await box.click()
-      }
-    }
+      return (await box.isSelected()) === wanted ? null : box
+    })
+
+    await forEachInOrder(
+      toChange.filter((box) => box !== null),
+      (box) => box.click()
+    )
   }
 }
 

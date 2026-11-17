@@ -1,3 +1,5 @@
+import { readEach } from '#support/element-values'
+
 // The Admin area's two search forms as a session with script off sees them.
 // They are GET forms, so they must work with nothing but the browser: each
 // method takes the script-free session (see #support/no-script-session) and
@@ -24,26 +26,21 @@ class AdminWithoutScriptPage {
   }
 
   async auditActions(session) {
-    const actions = []
+    const rows = await session.$$('[data-testid="audit-row"]').getElements()
 
-    for (const row of await session.$$('[data-testid="audit-row"]')) {
-      // When, Who, Action: the third cell names what was done.
-      const cells = await row.$$('td')
+    // When, Who, Action: the third cell names what was done.
+    return readEach(rows, async (row) => {
+      const cells = await row.$$('td').getElements()
 
-      actions.push((await cells[2].getText()).trim())
-    }
-
-    return actions
+      return (await cells[2].getText()).trim()
+    })
   }
 
   async firstLinkTexts(session, rowSelector) {
-    const texts = []
+    const rows = await session.$$(rowSelector).getElements()
+    const texts = await readEach(rows, (row) => row.$('a').getText())
 
-    for (const row of await session.$$(rowSelector)) {
-      texts.push((await row.$('a').getText()).trim())
-    }
-
-    return texts
+    return texts.map((text) => text.trim())
   }
 
   waitForQuery(session, name, value) {

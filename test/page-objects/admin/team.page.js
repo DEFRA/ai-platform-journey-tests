@@ -1,5 +1,6 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { readEach } from '#support/element-values'
 
 // A team in the Admin area: its status, service code, environments and
 // members, with Add a member and a Remove link for each member.
@@ -68,19 +69,16 @@ class AdminTeamPage extends Page {
 
   // Each member as the page shows them: { name, email, role }.
   async members() {
-    const members = []
+    const rows = await this.memberRows.getElements()
 
-    for (const row of await this.memberRows.getElements()) {
+    return readEach(rows, async (row) => {
       const cells = await row.$$('td').getElements()
+      const [name, email, role] = (
+        await readEach(cells, (cell) => cell.getText())
+      ).map((text) => text.trim())
 
-      members.push({
-        name: (await cells[0].getText()).trim(),
-        email: (await cells[1].getText()).trim(),
-        role: (await cells[2].getText()).trim()
-      })
-    }
-
-    return members
+      return { name, email, role }
+    })
   }
 
   // The team's id, which the audit log's Team filter takes, from the link to it.

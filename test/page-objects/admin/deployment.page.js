@@ -1,5 +1,6 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { readEach } from '#support/element-values'
 
 // One team's deployment in one environment, for a Platform Admin: its credential,
 // its client secrets (each with a Revoke link) and the health of each model
@@ -69,20 +70,21 @@ class AdminDeploymentPage extends Page {
 
   // Each secret as the page shows it: { hint, expires, status, canRevoke }.
   async secrets() {
-    const secrets = []
+    const rows = await this.secretRows.getElements()
 
-    for (const row of await this.secretRows.getElements()) {
+    return readEach(rows, async (row) => {
       const cells = await row.$$('td').getElements()
+      const [hint, expires, status] = (
+        await readEach(cells, (cell) => cell.getText())
+      ).map((text) => text.trim())
 
-      secrets.push({
-        hint: (await cells[0].getText()).trim().replace(/^Ending /, ''),
-        expires: (await cells[1].getText()).trim(),
-        status: (await cells[2].getText()).trim(),
+      return {
+        hint: hint.replace(/^Ending /, ''),
+        expires,
+        status,
         canRevoke: await row.$('[data-testid="revoke-secret"]').isExisting()
-      })
-    }
-
-    return secrets
+      }
+    })
   }
 
   modelRow(modelName) {

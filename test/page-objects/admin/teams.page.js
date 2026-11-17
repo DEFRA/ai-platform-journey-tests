@@ -1,5 +1,6 @@
 import { $, $$, browser } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { readEach } from '#support/element-values'
 
 // The status filter's choices and what each puts in the address.
 const STATUS_VALUES = {
@@ -63,13 +64,10 @@ class AdminTeamsPage extends Page {
   }
 
   async teamNames() {
-    const names = []
+    const rows = await this.rows.getElements()
+    const names = await readEach(rows, (row) => row.$('a').getText())
 
-    for (const row of await this.rows.getElements()) {
-      names.push((await row.$('a').getText()).trim())
-    }
-
-    return names
+    return names.map((name) => name.trim())
   }
 
   async search(text) {

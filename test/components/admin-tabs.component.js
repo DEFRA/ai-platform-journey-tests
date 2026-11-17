@@ -1,5 +1,7 @@
 import { $ } from '@wdio/globals'
 
+import { readEach } from '#support/element-values'
+
 // The tabs under the Admin heading: Teams, Audit log and, once built, others.
 // The current one is marked with aria-current="page".
 class AdminTabs {
@@ -9,13 +11,9 @@ class AdminTabs {
 
   async tabTexts() {
     const links = await this.root.$$('a').getElements()
-    const texts = []
+    const texts = await readEach(links, (link) => link.getText())
 
-    for (const link of links) {
-      texts.push((await link.getText()).trim())
-    }
-
-    return texts
+    return texts.map((text) => text.trim())
   }
 
   tab(text) {

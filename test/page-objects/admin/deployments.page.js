@@ -1,6 +1,7 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
 import { ENVIRONMENT } from '#support/deployments'
+import { readEach } from '#support/element-values'
 
 // The Deployments tab: each team's deployment in one environment at a time,
 // found by team name, model, status and credential, with a tab for each
@@ -91,13 +92,10 @@ class AdminDeploymentsPage extends Page {
   }
 
   async teamNames() {
-    const names = []
+    const rows = await this.rows.getElements()
+    const names = await readEach(rows, (row) => row.$('a').getText())
 
-    for (const row of await this.rows.getElements()) {
-      names.push((await row.$('a').getText()).trim())
-    }
-
-    return names
+    return names.map((name) => name.trim())
   }
 
   // Applies what is on the form: the choices named, by the text shown, then

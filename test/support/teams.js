@@ -40,7 +40,7 @@ export async function createTeam({
     )
   }
 
-  const [, slug] = new URL(await browser.getUrl()).pathname.match(TEAM_PATH)
+  const [, slug] = TEAM_PATH.exec(new URL(await browser.getUrl()).pathname)
 
   return slug
 }
