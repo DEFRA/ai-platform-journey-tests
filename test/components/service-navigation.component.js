@@ -1,7 +1,8 @@
 import { $ } from '@wdio/globals'
 
-// The service navigation under the header: Model catalogue, Personal access,
-// Teams, Environments and Help once signed in; Model catalogue and Help before.
+// The service navigation under the header: Home, Model catalogue, Personal
+// access, Teams, Environments (and Admin for a Platform Admin) and Help once
+// signed in; Home, Model catalogue and Help before.
 class ServiceNavigation {
   get root() {
     return $('.govuk-service-navigation')

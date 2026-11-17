@@ -13,9 +13,10 @@ describe('Pre-signin: home and model browsing', () => {
     await expect(HomePage.pageHeading).toBeDisplayed()
   })
 
-  it('shows only the Model catalogue, Help and Sign in links before signing in', async () => {
+  it('shows only the Home, Model catalogue, Help and Sign in links before signing in', async () => {
     await HomePage.open()
     await expect(await ServiceNavigation.linkTexts()).toEqual([
+      'Home',
       'Model catalogue',
       'Help',
       'Sign in'
