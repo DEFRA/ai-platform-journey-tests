@@ -126,6 +126,13 @@ team and Enable team with what a team member then sees, each with the audit rows
   The backend must run with `TENANT_ORCHESTRATOR=mock` and `PROVISIONING_MODE=mock`: with a live provisioning mode a
   deployment waits on real Azure checks and never finishes. `JOURNEY_TEST_ENVIRONMENT` (default `infradev`) and
   `JOURNEY_TEST_ENVIRONMENT_LABEL` (default `Development`, what the portal calls it) name the environment.
+- The models the journeys deploy must be offered to a team in that environment. The backend's file catalogue
+  (`src/common/seed/models.seed.json`) lists its models for `sandbox` only, and `gpt-5-nano` for research only, so
+  `infradev` has no team model until the database says so. After the backend has started (every start re-syncs the
+  catalogue and undoes this), add `infradev` to each eligible model's `environments`, and give `gpt-5-nano` the
+  `team` tier (`tiers`, `skus.0.tiers`) and `skus.0.regions: ['uksouth']`, in the backend's database. The backend caches
+  the model list for five minutes, so start a run only after that has passed. `deployments` deploys `gpt-5-nano`;
+  the other specs deploy `gpt-4o`.
 - `JOURNEY_TEST_MONGO_URI` (default `mongodb://127.0.0.1:27017/`) and `JOURNEY_TEST_MONGO_DATABASE`
   (default `ai-platform-backend-api`) point at the database the backend under test uses. Set the
   database when the backend is started with its own `MONGO_DATABASE`. `JOURNEY_TEST_MOCK_OID` is the
