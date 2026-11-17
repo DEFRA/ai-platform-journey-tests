@@ -2,6 +2,9 @@ import { $$, browser } from '@wdio/globals'
 
 import NewTeamPage from '#page-objects/teams/new-team.page'
 
+// A stamp in letters and digits (base 36), short and different each time.
+const BASE_36 = 36
+
 // A team's own pages: /teams/{slug}/... but not the "new" page that asks for one.
 const TEAM_PATH = /^\/teams\/(?!new(?:\/|$))([^/]+)/
 
@@ -49,7 +52,7 @@ export async function createTeam({
  * @param {string} serviceCode
  */
 export function newTeamNamed(purpose, serviceCode) {
-  const stamp = Date.now().toString(36)
+  const stamp = Date.now().toString(BASE_36)
 
   return { name: `Admin journey ${stamp} ${purpose}`, serviceCode }
 }

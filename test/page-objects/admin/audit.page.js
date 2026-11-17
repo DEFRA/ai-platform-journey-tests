@@ -120,10 +120,10 @@ class AdminAuditPage extends Page {
   async events() {
     const events = []
 
-    for (const row of await this.rows) {
+    for (const row of await this.rows.getElements()) {
       const texts = []
 
-      for (const cell of await row.$$('td')) {
+      for (const cell of await row.$$('td').getElements()) {
         texts.push((await cell.getText()).trim())
       }
 
@@ -139,7 +139,11 @@ class AdminAuditPage extends Page {
   async times() {
     const times = []
 
-    for (const time of await $$('[data-testid="audit-row"] time')) {
+    const timeElements = await $$(
+      '[data-testid="audit-row"] time'
+    ).getElements()
+
+    for (const time of timeElements) {
       times.push(await time.getAttribute('datetime'))
     }
 
@@ -149,7 +153,7 @@ class AdminAuditPage extends Page {
   async teamOptions() {
     const options = []
 
-    for (const option of await this.teamSelect.$$('option')) {
+    for (const option of await this.teamSelect.$$('option').getElements()) {
       options.push((await option.getText()).trim())
     }
 

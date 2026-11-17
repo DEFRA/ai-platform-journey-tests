@@ -8,7 +8,7 @@ class AdminTabs {
   }
 
   async tabTexts() {
-    const links = await this.root.$$('a')
+    const links = await this.root.$$('a').getElements()
     const texts = []
 
     for (const link of links) {

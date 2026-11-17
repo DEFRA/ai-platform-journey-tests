@@ -70,8 +70,8 @@ class AdminTeamPage extends Page {
   async members() {
     const members = []
 
-    for (const row of await this.memberRows) {
-      const cells = await row.$$('td')
+    for (const row of await this.memberRows.getElements()) {
+      const cells = await row.$$('td').getElements()
 
       members.push({
         name: (await cells[0].getText()).trim(),

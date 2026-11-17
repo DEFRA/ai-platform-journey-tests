@@ -65,7 +65,7 @@ class AdminTeamsPage extends Page {
   async teamNames() {
     const names = []
 
-    for (const row of await this.rows) {
+    for (const row of await this.rows.getElements()) {
       names.push((await row.$('a').getText()).trim())
     }
 

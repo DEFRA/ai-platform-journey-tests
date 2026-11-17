@@ -71,8 +71,8 @@ class AdminDeploymentPage extends Page {
   async secrets() {
     const secrets = []
 
-    for (const row of await this.secretRows) {
-      const cells = await row.$$('td')
+    for (const row of await this.secretRows.getElements()) {
+      const cells = await row.$$('td').getElements()
 
       secrets.push({
         hint: (await cells[0].getText()).trim().replace(/^Ending /, ''),

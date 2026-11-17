@@ -50,7 +50,7 @@ class AdminChooseEnvironmentsPage extends Page {
   async tickedLabels() {
     const labels = []
 
-    for (const box of await this.checkboxes) {
+    for (const box of await this.checkboxes.getElements()) {
       if (await box.isSelected()) {
         const id = await box.getAttribute('id')
 
@@ -63,7 +63,7 @@ class AdminChooseEnvironmentsPage extends Page {
 
   // Ticks exactly the environments named (by code), unticking any other.
   async choose(codes) {
-    for (const box of await this.checkboxes) {
+    for (const box of await this.checkboxes.getElements()) {
       const wanted = codes.includes(await box.getAttribute('value'))
 
       if ((await box.isSelected()) !== wanted) {
