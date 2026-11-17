@@ -250,6 +250,48 @@ describeOnMockStack(
         await setMockUserPlatformAdmin(true)
       })
 
+      it('enables the team when no environment is ticked, and the environment stays disabled', async () => {
+        await AdminTeamPage.open(slug)
+        await AdminTeamPage.enableTeamButton.click()
+        await AdminChooseEnvironmentsPage.choose([])
+        await AdminChooseEnvironmentsPage.submitButton.click()
+
+        await expect(AdminTeamPage.pageHeading).toHaveText(team.name)
+        await expect(AdminTeamPage.notification).toHaveText(
+          expect.stringContaining('Team enabled.')
+        )
+        await expect(AdminTeamPage.summaryValue('Status')).toHaveText('Active')
+        // The environment is still locked, so Enable team is still offered.
+        await expect(AdminTeamPage.enableTeamButton).toBeDisplayed()
+      })
+
+      it('asks again, with the error shown, when nothing is ticked on an enabled team', async () => {
+        await AdminTeamPage.enableTeamButton.click()
+
+        await expect(AdminChooseEnvironmentsPage.hint).toHaveText(
+          expect.stringContaining('The team is already enabled.')
+        )
+
+        await AdminChooseEnvironmentsPage.choose([])
+        await AdminChooseEnvironmentsPage.submitButton.click()
+
+        await expect(AdminChooseEnvironmentsPage.errorSummary).toHaveText(
+          expect.stringContaining('Choose at least one environment to unlock')
+        )
+        await expect(AdminChooseEnvironmentsPage.fieldError).toHaveText(
+          expect.stringContaining('Choose at least one environment to unlock')
+        )
+        await expect(browser).toHaveTitle(expect.stringContaining('Error:'))
+        await expect(
+          AdminChooseEnvironmentsPage.checkbox(ENVIRONMENT)
+        ).toBeExisting()
+
+        // Nothing was changed: the environment is still disabled.
+        await AdminTeamPage.open(slug)
+        await expect(AdminTeamPage.summaryValue('Status')).toHaveText('Active')
+        await expect(AdminTeamPage.enableTeamButton).toBeDisplayed()
+      })
+
       it('offers the disabled environments to unlock, all ticked, and lifts the lock', async () => {
         await AdminTeamPage.open(slug)
         await AdminTeamPage.enableTeamButton.click()

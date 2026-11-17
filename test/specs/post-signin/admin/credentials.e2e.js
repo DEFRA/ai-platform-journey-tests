@@ -240,6 +240,18 @@ describeOnMockStack(
         await expect(AdminReasonPage.effect).toHaveText(
           expect.stringContaining('The team’s other secrets are not changed.')
         )
+        // What revoking does not do: a token already issued keeps working, and
+        // Disable credentials is the way to stop calls now.
+        await expect(AdminReasonPage.effect).toHaveText(
+          expect.stringContaining(
+            'A token already issued with it keeps working for up to 90 minutes.'
+          )
+        )
+        await expect(AdminReasonPage.effect).toHaveText(
+          expect.stringContaining(
+            'To stop calls now, also use Disable credentials on this deployment.'
+          )
+        )
 
         await AdminReasonPage.submitWith('')
 

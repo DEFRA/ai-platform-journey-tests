@@ -33,6 +33,15 @@ class AdminChooseEnvironmentsPage extends Page {
     return $('.govuk-error-summary')
   }
 
+  // The hint under "Which environments?" and the message beside the boxes.
+  get hint() {
+    return $('#environments-hint')
+  }
+
+  get fieldError() {
+    return $('#environments-error')
+  }
+
   checkbox(code) {
     return $(`input[name="environments"][value="${code}"]`)
   }
