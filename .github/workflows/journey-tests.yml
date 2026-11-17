@@ -12,7 +12,9 @@ on:
 jobs:
   build:
     name: Run Journey Tests
-    runs-on: ubuntu-latest
+    # Pinned for the same reason as check-pull-request.yml: WebdriverIO's
+    # xvfb workers fail with "write EINVAL" on ubuntu-26.04.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./run-journey-tests
