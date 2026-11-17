@@ -9,6 +9,7 @@ import { signInAs } from '#support/admin-session'
 import {
   addClientSecret,
   deployModel,
+  ENVIRONMENT,
   ENVIRONMENT_LABEL
 } from '#support/deployments'
 import { FORCED_FAILURE_MARKERS } from '#support/journey-data'
@@ -81,6 +82,13 @@ describeOnMockStack('Platform Admin: the Deployments tab', function () {
       )
       await expect(AdminDeploymentsPage.pageHeading).toHaveText('Deployments')
       await expect(AdminTabs.currentTab).toHaveText('Deployments')
+
+      // The tab of the journeys' environment, whichever the list opens on.
+      await AdminDeploymentsPage.environmentTab(ENVIRONMENT_LABEL).click()
+
+      await expect(browser).toHaveUrl(
+        expect.stringContaining(`environment=${ENVIRONMENT}`)
+      )
       await expect(AdminDeploymentsPage.currentEnvironmentTab).toHaveText(
         ENVIRONMENT_LABEL
       )

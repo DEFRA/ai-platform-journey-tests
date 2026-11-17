@@ -1,12 +1,22 @@
 import { $, $$ } from '@wdio/globals'
 import { Page } from '#page-objects/page'
+import { ENVIRONMENT } from '#support/deployments'
 
 // The Deployments tab: each team's deployment in one environment at a time,
 // found by team name, model, status and credential, with a tab for each
 // environment. A GET form, so a filter is an address.
 class AdminDeploymentsPage extends Page {
+  // The list in the journeys' environment (JOURNEY_TEST_ENVIRONMENT), with any
+  // other parameters of `query` (such as "?search=flood") kept. An environment
+  // named in `query` is the one asked for.
   open(query = '') {
-    return super.open(`/admin/deployments${query}`)
+    const params = new URLSearchParams(query)
+
+    if (!params.has('environment')) {
+      params.set('environment', ENVIRONMENT)
+    }
+
+    return super.open(`/admin/deployments?${params}`)
   }
 
   get searchField() {
@@ -54,6 +64,10 @@ class AdminDeploymentsPage extends Page {
     return $('nav[aria-label="Environment"]')
   }
 
+  environmentTab(label) {
+    return this.environmentTabs.$(`a=${label}`)
+  }
+
   get currentEnvironmentTab() {
     return this.environmentTabs.$('a[aria-current="page"]')
   }
@@ -79,7 +93,7 @@ class AdminDeploymentsPage extends Page {
   async teamNames() {
     const names = []
 
-    for (const row of await this.rows) {
+    for (const row of await this.rows.getElements()) {
       names.push((await row.$('a').getText()).trim())
     }
 
