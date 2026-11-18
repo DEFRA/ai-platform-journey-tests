@@ -16,13 +16,9 @@ import {
   addClientSecret,
   deployModel,
   ENVIRONMENT,
-  ENVIRONMENT_LABEL,
-  ENVIRONMENT_REGISTRY_NAME
+  ENVIRONMENT_LABEL
 } from '#support/deployments'
-import {
-  answerFederateQuestions,
-  federateCdpService
-} from '#support/federation'
+import { federateCdpService } from '#support/federation'
 import { journeyData } from '#support/journey-data'
 import { isMockStack, setMockUserPlatformAdmin } from '#support/mock-stack'
 import { createTeam, newTeamNamed } from '#support/teams'
@@ -39,7 +35,6 @@ const READY = 'Ready to use'
 const CREDENTIALS_HEADING = 'Credentials are disabled'
 const CREDENTIALS_MESSAGE =
   'Your team’s credentials are disabled here. You cannot add, view or rotate a client secret, or create or change a passwordless credential. You can still revoke a client secret and remove an application.'
-const FEDERATE_REFUSED = `${ENVIRONMENT_REGISTRY_NAME}: credentials are disabled, so you cannot create a passwordless credential there`
 
 describeOnMockStack(
   'Platform Admin: removing a federated application, and a team whose credentials are disabled',
@@ -305,13 +300,16 @@ describeOnMockStack(
         await expect(EnvironmentPage.changeLimitsLink).toBeDisplayed()
       })
 
-      it('is refused the Federate journey at the answers, with the environment named, and nothing is made', async () => {
-        await answerFederateQuestions(slug, REFUSED)
+      it('is told the credentials are disabled at the environments question, and nothing is made', async () => {
+        await FederatePage.open(slug, ENVIRONMENT)
+        await FederatePage.hostCdp.click()
+        await FederatePage.continueButton.click()
 
-        await expect(FederatePage.errorSummary).toHaveText(
-          expect.stringContaining(FEDERATE_REFUSED)
+        await expect(ErrorPage.pageHeading).toHaveText(CREDENTIALS_HEADING)
+        await expect(ErrorPage.plainMessage).toHaveText(CREDENTIALS_MESSAGE)
+        await expect(browser).toHaveTitle(
+          expect.stringContaining(CREDENTIALS_HEADING)
         )
-        await expect(browser).toHaveTitle(expect.stringContaining('Error:'))
 
         await EnvironmentPage.open(slug, ENVIRONMENT)
 
