@@ -14,7 +14,7 @@ const describeOnMockStack = isMockStack() ? describe : describe.skip
 // The backend's AUDIT_RETENTION_DAYS default; set the same variable here when
 // the stack is started with another.
 const RETENTION_DAYS = process.env.JOURNEY_TEST_AUDIT_RETENTION_DAYS || '30'
-const PAGE_SIZE = 25
+const PAGE_SIZE = 10
 // More refusals than one page holds, so the filtered log pages.
 const REFUSALS = PAGE_SIZE + 2
 
@@ -88,7 +88,7 @@ describeOnMockStack('Platform Admin: the audit log', function () {
   })
 
   describe('the whole log', () => {
-    it('lists the events newest first, 25 a page, and says how long they are kept', async () => {
+    it('lists the events newest first, 10 a page, and says how long they are kept', async () => {
       await AdminAuditPage.open()
 
       await expect(AdminTabs.currentTab).toHaveText('Audit log')

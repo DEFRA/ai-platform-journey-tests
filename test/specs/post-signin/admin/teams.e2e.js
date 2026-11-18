@@ -134,7 +134,7 @@ describeOnMockStack('Platform Admin: finding a team and opening it', () => {
     // Creating a page and a bit more of teams takes a while.
     this.timeout(300000)
 
-    const pageSize = 25
+    const pageSize = 10
     // Not containing the stamp above, so the searches there never find these.
     const longStamp = [...stamp].reverse().join('') + 'x'
     const teamCount = pageSize + 1
@@ -150,7 +150,7 @@ describeOnMockStack('Platform Admin: finding a team and opening it', () => {
       }
     })
 
-    it('shows 25 teams a page and keeps the search on the next page', async () => {
+    it('shows 10 teams a page and keeps the search on the next page', async () => {
       await AdminTeamsPage.open(`?search=${encodeURIComponent(longStamp)}`)
 
       await expect(AdminTeamsPage.rows).toBeElementsArrayOfSize(pageSize)
