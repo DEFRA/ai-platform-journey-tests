@@ -107,8 +107,10 @@ describeOnMockStack(
         await expect(AdminReasonPage.note).toHaveText(
           expect.stringContaining('Its credentials keep working.')
         )
-        await expect(AdminReasonPage.note).not.toHaveText(
-          expect.stringContaining('To stop calls')
+        await expect(AdminReasonPage.note).toHaveText(
+          expect.stringContaining(
+            'To stop calls, disable its credentials on the Deployments tab.'
+          )
         )
 
         await AdminReasonPage.submitWith('')

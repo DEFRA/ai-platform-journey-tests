@@ -104,6 +104,11 @@ describeOnMockStack(
         await expect(AdminReasonPage.effect).toHaveText(
           expect.stringContaining('The team is not told why.')
         )
+        await expect(AdminReasonPage.effect).toHaveText(
+          expect.stringContaining(
+            'Calls using the team’s credentials in these environments stop within 60 seconds.'
+          )
+        )
 
         await AdminReasonPage.submitWith('')
 
@@ -246,10 +251,10 @@ describeOnMockStack(
             'A token already issued with it keeps working until it expires, up to 2 hours.'
           )
         )
-        // Disable credentials has no gateway effect until S2, so the page does
-        // not offer it as a way to stop calls.
-        await expect(AdminReasonPage.effect).not.toHaveText(
-          expect.stringContaining('Disable credentials')
+        await expect(AdminReasonPage.effect).toHaveText(
+          expect.stringContaining(
+            'To stop calls now, also use Disable credentials on this deployment.'
+          )
         )
 
         await AdminReasonPage.submitWith('')
