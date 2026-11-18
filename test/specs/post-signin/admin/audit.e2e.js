@@ -75,6 +75,7 @@ describeOnMockStack('Platform Admin: the audit log', function () {
     await addMemberAsAdmin(slugX, SECOND_ADMIN, 'admin')
     await AdminTeamPage.removeLink('Dev User').click()
     await AdminRemoveMemberPage.confirm()
+    await expect(AdminTeamPage.notification).toBeDisplayed()
     await AdminAddMemberPage.open(slugX)
     await AdminAddMemberPage.add({ ...SIGNED_IN, role: 'admin' })
     await expect(AdminAddMemberPage.errorSummary).toBeDisplayed()
