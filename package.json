@@ -51,6 +51,7 @@
     "eslint-plugin-prettier": "5.5.6",
     "eslint-plugin-wdio": "9.31.3",
     "husky": "9.1.7",
+    "mongodb": "7.7.0",
     "prettier": "3.9.9"
   }
 }

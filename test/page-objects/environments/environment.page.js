@@ -21,6 +21,14 @@ class EnvironmentPage extends Page {
     return $('[data-testid="deploy-a-model"]')
   }
 
+  get addClientSecretButton() {
+    return $('[data-testid="add-client-secret"]')
+  }
+
+  get clientSecretRows() {
+    return $$('[data-testid="client-secret-row"]')
+  }
+
   get inProgress() {
     return this.status.getAttribute('data-in-progress')
   }

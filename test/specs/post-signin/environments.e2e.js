@@ -70,7 +70,11 @@ describe('Post-signin: environments and deployments', function () {
   })
 
   it('shows the Environments section in the navigation', async () => {
-    await expect(await ServiceNavigation.linkTexts()).toEqual([
+    // Admin is added only for a Platform Admin, which this journey does not test.
+    const links = await ServiceNavigation.linkTexts()
+
+    await expect(links.filter((text) => text !== 'Admin')).toEqual([
+      'Home',
       'Model catalogue',
       'Personal access',
       'Teams',

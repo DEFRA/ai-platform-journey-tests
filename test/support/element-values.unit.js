@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { readEach } from './element-values.js'
+import { forEachInOrder, readEach } from './element-values.js'
 
 // Behaves like the array WebdriverIO's `getElements()` returns: its `map()`
 // is asynchronous and hands back a promise, not an array.
@@ -28,4 +28,38 @@ await test('readEach returns an empty array when nothing was found', async () =>
   )
 
   assert.deepEqual(values, [])
+})
+
+await test('forEachInOrder starts each action only once the one before has finished', async () => {
+  // The first action is the slower one, so running both together would
+  // finish the second first.
+  const firstActionMs = 20
+  const events = []
+  const act = async (name) => {
+    events.push(`start ${name}`)
+    await new Promise((resolve) =>
+      setTimeout(resolve, name === 'one' ? firstActionMs : 0)
+    )
+    events.push(`end ${name}`)
+  }
+
+  await forEachInOrder(webdriverArray(['one', 'two']), act)
+
+  assert.deepEqual(events, ['start one', 'end one', 'start two', 'end two'])
+})
+
+await test('forEachInOrder stops at a failure and runs nothing after it', async () => {
+  const done = []
+  const act = async (name) => {
+    if (name === 'two') {
+      throw new Error('two failed')
+    }
+    done.push(name)
+  }
+
+  await assert.rejects(
+    forEachInOrder(['one', 'two', 'three'], act),
+    /two failed/
+  )
+  assert.deepEqual(done, ['one'])
 })

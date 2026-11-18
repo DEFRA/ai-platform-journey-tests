@@ -38,7 +38,10 @@ jobs:
 
   tests:
     name: Run Journey Tests
-    runs-on: ubuntu-latest
+    # Pinned: on ubuntu-26.04 (ubuntu-latest from mid November 2026) every
+    # WebdriverIO worker started through xvfb-run fails with "write EINVAL"
+    # before a test runs. Return to ubuntu-latest once WebdriverIO fixes it.
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       contents: read
