@@ -71,21 +71,49 @@ services:
 
 
 ################################################################################
+# App-only tokens for the signed-out catalogue journeys. This local issuer uses
+# fixed test IDs and a throwaway key; it is not suitable for deployed services.
+  mock-oidc:
+    build:
+      context: ./docker/mock-oidc
+    env_file:
+      - ./docker/config/example-auth.env
+    environment:
+      - OIDC_MOCK_ISSUER_URL=http://mock-oidc:3100
+      - PORT=3100
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 3s
+      start_period: 2s
+      retries: 5
+
+
+################################################################################
 #
 # Add the services you want to test below.
 #
 ################################################################################
   ai-platform-frontend:
-    image: defradigital/ai-platform-frontend:${AI_PLATFORM_FRONTEND:-latest}
+    build:
+      context: ./docker/mock-frontend
+      args:
+        FRONTEND_IMAGE: ${AI_PLATFORM_FRONTEND:-latest}
+    image: ai-platform-journey-tests-frontend:local
     env_file:
       - ./docker/config/defaults.env
       - ./docker/config/example-frontend.env
+      - ./docker/config/example-auth.env
     environment:
       - PORT=3000
+      - NODE_ENV=development
+      - LOG_FORMAT=ecs
+      - OIDC_MOCK_ISSUER_URL=http://mock-oidc:3100
     depends_on:
       ai-platform-backend-api:
         condition: service_started
       redis:
+        condition: service_healthy
+      mock-oidc:
         condition: service_healthy
     ports:
       - 3000:3000
@@ -101,8 +129,11 @@ services:
     env_file:
       - ./docker/config/defaults.env
       - ./docker/config/example-backend.env
+      - ./docker/config/example-auth.env
     environment:
       - PORT=3001
+      - NODE_ENV=development
+      - PORTAL_AUTH_MOCK_ISSUER_URL=http://mock-oidc:3100
       # Team requests go through the mock orchestrator: no GitHub, SQS or
       # worker is needed, and each stage takes a few seconds so a journey can
       # watch a request move. It also honours the forced-failure marker in a
@@ -112,9 +143,10 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+      mock-oidc:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "http://localhost:3001/health"]
       interval: 3s
       start_period: 2s
       retries: 3
-
