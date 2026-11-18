@@ -63,8 +63,10 @@ describeOnMockStack(
             'Removing someone does not change the team’s credentials'
           )
         )
-        await expect(AdminRemoveMemberPage.warning).not.toHaveText(
-          expect.stringContaining('Disable credentials')
+        await expect(AdminRemoveMemberPage.warning).toHaveText(
+          expect.stringContaining(
+            'up to 2 hours, and Disable credentials stops calls now.'
+          )
         )
         await AdminRemoveMemberPage.confirm()
 

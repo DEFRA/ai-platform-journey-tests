@@ -13,6 +13,11 @@ export const ENVIRONMENT = process.env.JOURNEY_TEST_ENVIRONMENT || 'infradev'
 export const ENVIRONMENT_LABEL =
   process.env.JOURNEY_TEST_ENVIRONMENT_LABEL || 'Development'
 
+// The name the registry gives it, as the portal's refusals use it (the
+// frontend's environmentRegistryName): Infradev, then QA, PREPROD and PROD.
+export const ENVIRONMENT_REGISTRY_NAME =
+  ENVIRONMENT === 'infradev' ? 'Infradev' : ENVIRONMENT.toUpperCase()
+
 /**
  * Asks, as the person signed in (a team Admin), for a model in the team's
  * environment and waits until the request has finished, whether it ended well

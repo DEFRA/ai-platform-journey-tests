@@ -29,6 +29,45 @@ class EnvironmentPage extends Page {
     return $$('[data-testid="client-secret-row"]')
   }
 
+  // The banner shown while a Platform Admin has disabled the team's credentials
+  // here: what can and cannot be done, never why.
+  get credentialsBanner() {
+    return $('[data-testid="credentials-disabled-banner"]')
+  }
+
+  get credentialsBannerHeading() {
+    return this.credentialsBanner.$('.govuk-notification-banner__heading')
+  }
+
+  get federateButton() {
+    return $('[data-testid="federate-an-application"]')
+  }
+
+  // A client secret's action: a link when open, plain text when locked.
+  clientSecretAction(action) {
+    return $(`[data-testid="client-secret-${action}"]`)
+  }
+
+  clientSecretActionLocked(action) {
+    return $(`[data-testid="client-secret-${action}-locked"]`)
+  }
+
+  get applicationRows() {
+    return $$('[data-testid="application-row"]')
+  }
+
+  applicationRow(name) {
+    return $(`[data-testid="application-row"]*=${name}`)
+  }
+
+  applicationAction(action) {
+    return $(`[data-testid="application-${action}"]`)
+  }
+
+  applicationActionLocked(action) {
+    return $(`[data-testid="application-${action}-locked"]`)
+  }
+
   get inProgress() {
     return this.status.getAttribute('data-in-progress')
   }

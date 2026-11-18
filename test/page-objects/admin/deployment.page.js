@@ -87,6 +87,36 @@ class AdminDeploymentPage extends Page {
     })
   }
 
+  get federationRows() {
+    return $$('[data-testid="federation-row"]')
+  }
+
+  // A federated application's row, by its name in the first cell.
+  federationRow(name) {
+    return $(
+      `//tr[@data-testid="federation-row"][td[1][normalize-space()="${name}"]]`
+    )
+  }
+
+  // The tag that says where the application's change is.
+  federationStatus(name) {
+    return this.federationRow(name).$('.govuk-tag')
+  }
+
+  removeFederationLink(name) {
+    return this.federationRow(name).$('[data-testid="remove-federation"]')
+  }
+
+  reconcileFederationButton(name) {
+    return this.federationRow(name).$(
+      '[data-testid="reconcile-federation"] button'
+    )
+  }
+
+  retryFederationButton(name) {
+    return this.federationRow(name).$('[data-testid="retry-federation"] button')
+  }
+
   modelRow(modelName) {
     return $(
       `//tr[@data-testid="model-row"][td[1][normalize-space()="${modelName}"]]`
