@@ -16,7 +16,8 @@ import {
   addClientSecret,
   deployModel,
   ENVIRONMENT,
-  ENVIRONMENT_LABEL
+  ENVIRONMENT_LABEL,
+  ENVIRONMENT_REGISTRY_NAME
 } from '#support/deployments'
 import {
   answerFederateQuestions,
@@ -38,8 +39,7 @@ const READY = 'Ready to use'
 const CREDENTIALS_HEADING = 'Credentials are disabled'
 const CREDENTIALS_MESSAGE =
   'Your team’s credentials are disabled here. You cannot add, view or rotate a client secret, or create or change a passwordless credential. You can still revoke a client secret and remove an application.'
-const FEDERATE_REFUSED =
-  'Infradev: credentials are disabled, so you cannot create a passwordless credential there'
+const FEDERATE_REFUSED = `${ENVIRONMENT_REGISTRY_NAME}: credentials are disabled, so you cannot create a passwordless credential there`
 
 describeOnMockStack(
   'Platform Admin: removing a federated application, and a team whose credentials are disabled',
