@@ -29,8 +29,6 @@ import { createTeam, newTeamNamed } from '#support/teams'
 const describeOnMockStack = isMockStack() ? describe : describe.skip
 
 const MODEL_SLUG = 'gpt-4o'
-const REMOVED = 'journey-api'
-const KEPT = 'journey-worker'
 const REFUSED = 'journey-blocked'
 const POLL_MS = 3000
 const REMOVE_REASON = 'Journey test: this application is no longer wanted'
@@ -53,6 +51,10 @@ describeOnMockStack(
 
     const team = newTeamNamed('effects', 'JEF')
     const stamp = team.name.split(' ')[2]
+    // A CDP service is trusted by one team at a time, so a rerun on the same
+    // database must not reuse the names an earlier run left in use.
+    const REMOVED = `journey-api-${stamp}`
+    const KEPT = `journey-worker-${stamp}`
     let slug
     let teamId
 
