@@ -58,7 +58,11 @@
     "@eslint/config-array": {
       "minimatch": "11.0.1"
     },
+    "archiver-utils": {
+      "minimatch": "11.0.1"
+    },
     "basic-ftp": "6.2.6",
+    "deepmerge-ts": "8.0.2",
     "eslint": {
       "minimatch": "11.0.1"
     },
