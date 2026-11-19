@@ -53,5 +53,15 @@
     "husky": "9.1.7",
     "mongodb": "7.7.0",
     "prettier": "3.9.9"
+  },
+  "overrides": {
+    "@eslint/config-array": {
+      "minimatch": "11.0.1"
+    },
+    "basic-ftp": "6.2.6",
+    "eslint": {
+      "minimatch": "11.0.1"
+    },
+    "serialize-javascript": "7.1.4"
   }
 }
